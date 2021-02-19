@@ -1,0 +1,1 @@
+git+git://github.com/hpidcock/operator@b7598126e107bb4be5abc22f54c66883fc927b7a#egg=ops

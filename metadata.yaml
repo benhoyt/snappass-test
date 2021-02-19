@@ -1,0 +1,27 @@
+# Copyright 2021 Ben
+# See LICENSE file for licensing details.
+name: snappass-test
+description: TODO description
+summary: TODO summary
+min-juju-version: 2.9.0
+platforms:
+  - kubernetes
+systems:
+  - os: ubuntu
+    channel: 20.04/stable
+
+containers:
+  snappass:
+    systems:
+      - resource: snappass-image
+  redis:
+    systems:
+      - resource: redis-image
+
+resources:
+  snappass-image:
+    type: oci-image
+    description: Docker image for SnapPass
+  redis-image:
+    type: oci-image
+    description: Docker image for Redis
