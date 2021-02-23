@@ -46,21 +46,22 @@ class SnappassTestCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.snappass_workload_ready, self._on_snappass_workload_ready)
         self.framework.observe(self.on.redis_workload_ready, self._on_redis_workload_ready)
-        self._stored.set_default(things=[])
-
-    def _on_config_changed(self, _):
-        # Note: you need to uncomment the example in the config.yaml file for this to work (ensure
-        # to not just leave the example, but adapt to your configuration needs)
-        current = self.config["thing"]
-        if current not in self._stored.things:
-            logger.debug("found a new thing: %r", current)
-            self._stored.things.append(current)
+        self._stored.set_default(
+            snappass_workload_ready=False,
+            redis_started=False,
+        )
 
     def _on_snappass_workload_ready(self, event):
         logger.info('_on_snappass_workload_ready')
+        self._stored.snappass_workload_ready = True
+        if self._stored.redis_started:
+            self._start_snappass()
+
+    def _start_snappass(self):
+        logger.info('_start_snappass')
+        container = self.unit.containers['snappass']
         add_layer('snappass', """
 summary: snappass layer
 description: snappass layer
@@ -69,12 +70,13 @@ services:
         override: replace
         summary: snappass service
         command: snappass
-""", layer_name='snappass')
-        self.unit.containers['snappass'].start('snappass')
-        self.unit.status = ActiveStatus("snappass started")
+""")
+        container.start('snappass')
+        self.unit.status = ActiveStatus('snappass started')
 
     def _on_redis_workload_ready(self, event):
         logger.info('_on_redis_workload_ready')
+        container = self.unit.containers['redis']
         add_layer('redis', """
 summary: redis layer
 description: redis layer
@@ -83,9 +85,13 @@ services:
         override: replace
         summary: redis service
         command: redis-server
-""", layer_name='redis')
-        self.unit.containers['redis'].start('redis')
-        self.unit.status = ActiveStatus("redis started")
+""")
+        container.start('redis')
+        self.unit.status = ActiveStatus('redis started')
+        self._stored.redis_started = True
+
+        if self._stored.snappass_workload_ready:
+            self._start_snappass()
 
 
 if __name__ == "__main__":

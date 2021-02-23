@@ -1,1 +1,1 @@
-git+git://github.com/hpidcock/operator@b7598126e107bb4be5abc22f54c66883fc927b7a#egg=ops
+git+git://github.com/benhoyt/operator@a9fde1afda0c0f5056113872589942c300a4c202#egg=ops
