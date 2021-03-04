@@ -27,6 +27,7 @@ class SnappassTestCharm(CharmBase):
         self._stored.set_default(
             snappass_workload_ready=False,
             redis_started=False,
+            snappass_started=False,
         )
 
     def _on_snappass_workload_ready(self, event):
@@ -38,6 +39,9 @@ class SnappassTestCharm(CharmBase):
 
     def _start_snappass(self):
         logger.info('_start_snappass')
+        if self._stored.snappass_started:
+            logger.info('snappass already started')
+            return
         container = self.unit.containers['snappass']
         container.add_layer('snappass', """
 summary: snappass layer
@@ -51,6 +55,7 @@ services:
 """)
         container.autostart()
         self.unit.status = ActiveStatus('snappass started')
+        self._stored.snappass_started = True
 
     def _on_redis_workload_ready(self, event):
         logger.info('_on_redis_workload_ready')
