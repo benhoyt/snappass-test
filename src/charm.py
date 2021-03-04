@@ -39,7 +39,7 @@ class SnappassTestCharm(CharmBase):
     def _start_snappass(self):
         logger.info('_start_snappass')
         container = self.unit.containers['snappass']
-        container.merge_layer("""
+        container.add_layer('snappass', """
 summary: snappass layer
 description: snappass layer
 services:
@@ -55,7 +55,7 @@ services:
     def _on_redis_workload_ready(self, event):
         logger.info('_on_redis_workload_ready')
         container = event.workload
-        container.merge_layer("""
+        container.add_layer('redis', """
 summary: redis layer
 description: redis layer
 services:
