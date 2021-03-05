@@ -1,8 +1,8 @@
-# Copyright 2021 Ben
-# See LICENSE file for licensing details.
 name: snappass-test
-description: TODO description
-summary: TODO summary
+description: |
+    Test charm for Pinterest's SnapPass that uses Operator Framework
+    and K8s sidecar containers.
+summary: Test charm for Pinterest's SnapPass - K8s sidecar containers
 min-juju-version: 2.9.0
 platforms:
   - kubernetes
@@ -25,3 +25,7 @@ resources:
   redis-image:
     type: oci-image
     description: Docker image for Redis
+
+# To appease CharmHub (for now)
+series:
+  - focal
