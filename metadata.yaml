@@ -26,6 +26,6 @@ resources:
     type: oci-image
     description: Docker image for Redis
 
-# # To appease CharmHub (for now)
-# series:
-#   - focal
+# To appease CharmHub (for now)
+series:
+  - focal
