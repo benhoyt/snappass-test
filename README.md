@@ -14,27 +14,28 @@ $ charmcraft build
 Created 'snappass-test.charm'.
 ```
 
-I'm working against the Juju 2.9 branch, latest master (not 2.9-rc6 -- that may work, but it's not what I'm testing with). Something like this:
+You'll need version 1.14 or later of Go (`go version` will confirm your current version), and a custom version of the Juju 2.9 branch, as below:
 
 ```
-$ git clone https://github.com/juju/juju
+$ git clone -b demo-pebble https://github.com/benhoyt/juju
 $ cd juju
 $ make install
 $ make microk8s-operator-update  # to make the microk8s image and push to Docker
+$ export JUJU_BIN_DIR="$(pwd)/_build/linux_amd64/bin"
 ```
 
 When doing `juju deploy`, go to the `snappass-test` directory. You need to specify the resources manually:
 
 ```
-$ juju bootstrap microk8s
-$ juju add-model snappass
-$ juju deploy snappass-test --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
+$ ${JUJU_BIN_DIR}/juju bootstrap microk8s
+$ ${JUJU_BIN_DIR}/juju add-model snappass
+$ ${JUJU_BIN_DIR}/juju deploy snappass-test --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
 ```
 
 Or deploy against the local charm (see build instructions above):
 
 ```
-$ juju deploy ../snappass-test/snappass-test.charm snappass --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
+$ ${JUJU_BIN_DIR}/juju deploy ../snappass-test/snappass-test.charm snappass --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
 Located local charm "snappass-test", revision 0
 Deploying "snappass" from local charm "snappass-test", revision 0
 ```
@@ -42,7 +43,7 @@ Deploying "snappass" from local charm "snappass-test", revision 0
 After a while `juju status` should say something like this and (after a few seconds) give you an IP address:
 
 ```
-$ juju status
+$ ${JUJU_BIN_DIR}/juju status
 Model     Controller           Cloud/Region        Version  SLA          Timestamp
 snappass  microk8s-localhost2  microk8s/localhost  2.9-rc7  unsupported  07:03:51+13:00
 
