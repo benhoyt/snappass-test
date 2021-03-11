@@ -5,7 +5,7 @@
 Test charm for Pinterest's SnapPass that uses Operator Framework
 and K8s sidecar containers.
 
-This doesn't yet deploy via Charmhub (because of an issue with Charmhub resources). So you have to build and deploy the charm locally:
+This does deploy via Charmhub (but you need to specify `--resource` for the images manually, because of an issue with Charmhub resources). Or you can build and deploy the charm locally:
 
 ```
 $ git clone https://github.com/benhoyt/snappass-test
@@ -28,6 +28,12 @@ When doing `juju deploy`, go to the `snappass-test` directory. You need to speci
 ```
 $ juju bootstrap microk8s
 $ juju add-model snappass
+$ juju deploy snappass-test --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
+```
+
+Or deploy against the local charm (see build instructions above):
+
+```
 $ juju deploy ../snappass-test/snappass-test.charm snappass --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
 Located local charm "snappass-test", revision 0
 Deploying "snappass" from local charm "snappass-test", revision 0
