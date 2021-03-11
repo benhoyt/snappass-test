@@ -21,21 +21,21 @@ $ git clone -b demo-pebble https://github.com/benhoyt/juju
 $ cd juju
 $ make install
 $ make microk8s-operator-update  # to make the microk8s image and push to Docker
-$ export JUJU_BIN_DIR="$(pwd)/_build/linux_amd64/bin"
+$ export PATH="/home/${USER}/go/bin:$PATH"
 ```
 
 When doing `juju deploy`, go to the `snappass-test` directory. You need to specify the resources manually:
 
 ```
-$ ${JUJU_BIN_DIR}/juju bootstrap microk8s
-$ ${JUJU_BIN_DIR}/juju add-model snappass
-$ ${JUJU_BIN_DIR}/juju deploy snappass-test --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
+$ juju bootstrap microk8s
+$ juju add-model snappass
+$ juju deploy snappass-test --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
 ```
 
 Or deploy against the local charm (see build instructions above):
 
 ```
-$ ${JUJU_BIN_DIR}/juju deploy ../snappass-test/snappass-test.charm snappass --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
+$ juju deploy ../snappass-test/snappass-test.charm snappass --resource snappass-image=benhoyt/snappass-test --resource redis-image=redis
 Located local charm "snappass-test", revision 0
 Deploying "snappass" from local charm "snappass-test", revision 0
 ```
@@ -43,7 +43,7 @@ Deploying "snappass" from local charm "snappass-test", revision 0
 After a while `juju status` should say something like this and (after a few seconds) give you an IP address:
 
 ```
-$ ${JUJU_BIN_DIR}/juju status
+$ juju status
 Model     Controller           Cloud/Region        Version  SLA          Timestamp
 snappass  microk8s-localhost2  microk8s/localhost  2.9-rc7  unsupported  07:03:51+13:00
 
