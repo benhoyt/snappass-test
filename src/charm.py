@@ -9,7 +9,8 @@ import logging
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
-from ops.model import ActiveStatus
+from ops.model import ActiveStatus, ModelError
+from ops.pebble import ServiceInfo, ServiceStatus
 
 logger = logging.getLogger(__name__)
 
@@ -17,75 +18,79 @@ logger = logging.getLogger(__name__)
 class SnappassTestCharm(CharmBase):
     """Charm the service."""
 
-    _stored = StoredState()
-
     def __init__(self, *args):
         super().__init__(*args)
         self.framework.observe(self.on.snappass_pebble_ready, self._on_snappass_pebble_ready)
         self.framework.observe(self.on.redis_pebble_ready, self._on_redis_pebble_ready)
-        self._stored.set_default(
-            snappass_pebble_ready=False,
-            redis_started=False,
-            snappass_started=False,
-        )
 
     def _on_snappass_pebble_ready(self, event):
         logger.info("_on_snappass_pebble_ready")
-        self._stored.snappass_pebble_ready = True
-        if self._stored.redis_started:
-            # Redis started first, start snappass server now
+        container = self.unit.containers["redis"]
+
+        if self._is_running(container, "redis"):
+            logger.info("redis already started")
             self._start_snappass()
 
     def _start_snappass(self):
         logger.info("_start_snappass")
-        if self._stored.snappass_started:
-            logger.info("snappass already started")
-            return
         container = self.unit.containers["snappass"]
 
-        container.add_layer(
-            "snappass",
-            """
-summary: snappass layer
-description: snappass layer
-services:
-    snappass:
-        override: replace
-        summary: snappass service
-        command: snappass
-        default: start
-""",
-            True,
-        )
+        if self._is_running(container, "snappass"):
+            logger.info("snappass already started")
+            return
+
+        snappass_layer = {
+            "summary": "snappass layer",
+            "description": "snappass layer",
+            "services": {
+                "snappass": {
+                    "override": "replace",
+                    "summary": "snappass service",
+                    "command": "snappass",
+                    "default": "start",
+                }
+            },
+        }
+
+        container.add_layer("snappass", snappass_layer, True)
         container.autostart()
         self.unit.status = ActiveStatus("snappass started")
-        self._stored.snappass_started = True
 
     def _on_redis_pebble_ready(self, event):
         logger.info("_on_redis_pebble_ready")
         container = event.workload
-        container.add_layer(
-            "redis",
-            """
-summary: redis layer
-description: redis layer
-services:
-    redis:
-        override: replace
-        summary: redis service
-        command: redis-server
-        default: start
-""",
-            True,
-        )
+
+        if self._is_running(container, "redis"):
+            logger.info("redis already started")
+            return
+
+        redis_layer = {
+            "summary": "redis layer",
+            "description": "redis layer",
+            "services": {
+                "redis": {
+                    "override": "replace",
+                    "summary": "redis service",
+                    "command": "redis-server",
+                    "default": "start",
+                }
+            },
+        }
+
+        container.add_layer("redis", redis_layer, True)
         container.autostart()
         self.unit.status = ActiveStatus("redis started")
-        self._stored.redis_started = True
+        # Prod snappass to start
+        self._start_snappass()
 
-        if self._stored.snappass_pebble_ready:
-            # If snappass container is ready, start snappass server,
-            # otherwise wait for _on_snappass_pebble_ready event.
-            self._start_snappass()
+    def _is_running(self, container, service):
+        """Helper method to determine if a given service is running
+        in a given container"""
+        try:
+            service = container.get_service(service)
+        except ModelError:
+            return False
+        return service.current == ServiceStatus.ACTIVE
 
 
 if __name__ == "__main__":
