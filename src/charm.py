@@ -22,17 +22,17 @@ class SnappassTestCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.framework.observe(self.on.snappass_workload_ready, self._on_snappass_workload_ready)
-        self.framework.observe(self.on.redis_workload_ready, self._on_redis_workload_ready)
+        self.framework.observe(self.on.snappass_pebble_ready, self._on_snappass_pebble_ready)
+        self.framework.observe(self.on.redis_pebble_ready, self._on_redis_pebble_ready)
         self._stored.set_default(
-            snappass_workload_ready=False,
+            snappass_pebble_ready=False,
             redis_started=False,
             snappass_started=False,
         )
 
-    def _on_snappass_workload_ready(self, event):
-        logger.info('_on_snappass_workload_ready')
-        self._stored.snappass_workload_ready = True
+    def _on_snappass_pebble_ready(self, event):
+        logger.info('_on_snappass_pebble_ready')
+        self._stored.snappass_pebble_ready = True
         if self._stored.redis_started:
             # Redis started first, start snappass server now
             self._start_snappass()
@@ -57,8 +57,8 @@ services:
         self.unit.status = ActiveStatus('snappass started')
         self._stored.snappass_started = True
 
-    def _on_redis_workload_ready(self, event):
-        logger.info('_on_redis_workload_ready')
+    def _on_redis_pebble_ready(self, event):
+        logger.info('_on_redis_pebble_ready')
         container = event.workload
         container.add_layer('redis', """
 summary: redis layer
@@ -74,9 +74,9 @@ services:
         self.unit.status = ActiveStatus('redis started')
         self._stored.redis_started = True
 
-        if self._stored.snappass_workload_ready:
+        if self._stored.snappass_pebble_ready:
             # If snappass container is ready, start snappass server,
-            # otherwise wait for _on_snappass_workload_ready event.
+            # otherwise wait for _on_snappass_pebble_ready event.
             self._start_snappass()
 
 

@@ -1,22 +1,18 @@
 name: snappass-test
 description: |
-    Test charm for Pinterest's SnapPass that uses Operator Framework
+    Test charm for Pinterest's SnapPass that uses Python Operator Framework
     and K8s sidecar containers.
-summary: Test charm for Pinterest's SnapPass - K8s sidecar containers
-min-juju-version: 2.9.0
-platforms:
-  - kubernetes
-systems:
-  - os: ubuntu
+summary: Test charm for Pinterest's SnapPass using K8s sidecar containers.
+
+bases:
+  - name: ubuntu
     channel: 20.04/stable
 
 containers:
   snappass:
-    systems:
-      - resource: snappass-image
+    resource: snappass-image
   redis:
-    systems:
-      - resource: redis-image
+    resource: redis-image
 
 resources:
   snappass-image:
@@ -25,7 +21,3 @@ resources:
   redis-image:
     type: oci-image
     description: Docker image for Redis
-
-# To appease CharmHub (for now)
-series:
-  - focal
