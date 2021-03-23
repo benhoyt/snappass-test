@@ -52,7 +52,7 @@ class SnappassTestCharm(CharmBase):
             },
         }
 
-        container.add_layer("snappass", snappass_layer, True)
+        container.add_layer("snappass", snappass_layer, combine=True)
         container.autostart()
         self.unit.status = ActiveStatus("snappass started")
 
@@ -77,7 +77,7 @@ class SnappassTestCharm(CharmBase):
             },
         }
 
-        container.add_layer("redis", redis_layer, True)
+        container.add_layer("redis", redis_layer, combine=True)
         container.autostart()
         self.unit.status = ActiveStatus("redis started")
         # Prod snappass to start
