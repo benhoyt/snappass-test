@@ -7,10 +7,9 @@
 import logging
 
 from ops.charm import CharmBase
-from ops.main import main
 from ops.framework import StoredState
+from ops.main import main
 from ops.model import ActiveStatus
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,19 +30,22 @@ class SnappassTestCharm(CharmBase):
         )
 
     def _on_snappass_pebble_ready(self, event):
-        logger.info('_on_snappass_pebble_ready')
+        logger.info("_on_snappass_pebble_ready")
         self._stored.snappass_pebble_ready = True
         if self._stored.redis_started:
             # Redis started first, start snappass server now
             self._start_snappass()
 
     def _start_snappass(self):
-        logger.info('_start_snappass')
+        logger.info("_start_snappass")
         if self._stored.snappass_started:
-            logger.info('snappass already started')
+            logger.info("snappass already started")
             return
-        container = self.unit.containers['snappass']
-        container.add_layer('snappass', """
+        container = self.unit.containers["snappass"]
+
+        container.add_layer(
+            "snappass",
+            """
 summary: snappass layer
 description: snappass layer
 services:
@@ -52,15 +54,19 @@ services:
         summary: snappass service
         command: snappass
         default: start
-""")
+""",
+            True,
+        )
         container.autostart()
-        self.unit.status = ActiveStatus('snappass started')
+        self.unit.status = ActiveStatus("snappass started")
         self._stored.snappass_started = True
 
     def _on_redis_pebble_ready(self, event):
-        logger.info('_on_redis_pebble_ready')
+        logger.info("_on_redis_pebble_ready")
         container = event.workload
-        container.add_layer('redis', """
+        container.add_layer(
+            "redis",
+            """
 summary: redis layer
 description: redis layer
 services:
@@ -69,9 +75,11 @@ services:
         summary: redis service
         command: redis-server
         default: start
-""")
+""",
+            True,
+        )
         container.autostart()
-        self.unit.status = ActiveStatus('redis started')
+        self.unit.status = ActiveStatus("redis started")
         self._stored.redis_started = True
 
         if self._stored.snappass_pebble_ready:
