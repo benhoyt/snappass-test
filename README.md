@@ -11,7 +11,7 @@ $ charmcraft build
 Created 'snappass-test.charm'.
 ```
 
-You'll need version 1.14 or later of Go (`go version` will confirm your current version), and the latest Juju 2.9 release. Or you can build Juju from source:
+You'll need version 1.14 or later of Go (`go version` will confirm your current version), and the **latest Juju 2.9 edge version.** Or you can build Juju from source:
 
 ```
 $ git clone -b 2.9 https://github.com/juju/juju

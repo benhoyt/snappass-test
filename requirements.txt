@@ -1,1 +1,1 @@
-git+git://github.com/canonical/operator@57b4f5259b93b320d7f412798dd22a58b031c14f#egg=ops
+git+git://github.com/canonical/operator@1a1a079c70d5971082c5b3fdcbf271c62b298b08#egg=ops

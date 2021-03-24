@@ -47,7 +47,7 @@ class SnappassTestCharm(CharmBase):
                     "override": "replace",
                     "summary": "snappass service",
                     "command": "snappass",
-                    "default": "start",
+                    "startup": "enabled",
                 }
             },
         }
@@ -72,7 +72,7 @@ class SnappassTestCharm(CharmBase):
                     "override": "replace",
                     "summary": "redis service",
                     "command": "redis-server",
-                    "default": "start",
+                    "startup": "enabled",
                 }
             },
         }
