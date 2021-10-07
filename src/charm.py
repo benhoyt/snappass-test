@@ -60,6 +60,16 @@ class SnappassTestCharm(CharmBase):
         logger.info("_on_redis_pebble_ready")
         container = event.workload
 
+        logger.info("execing echo")
+        process = container.pebble.exec(['echo', 'Some output!'])
+        out, err = process.wait_output()
+        logger.info("exec output: {!r}".format(out))
+        logger.info("exec error: {!r}".format(err))
+        logger.info("execing /bin/sh")
+        process = container.pebble.exec(['/bin/sh', '-c', 'echo ' + out.strip().upper() + ' >/tmp/exec-test'])
+        process.wait()
+        logger.info("execing done")
+
         if self._is_running(container, "redis"):
             logger.info("redis already started")
             return
