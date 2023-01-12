@@ -7,10 +7,9 @@
 import logging
 
 from ops.charm import CharmBase
-from ops.framework import StoredState
 from ops.main import main
 from ops.model import ActiveStatus, ModelError
-from ops.pebble import ServiceInfo, ServiceStatus
+from ops.pebble import ServiceStatus
 
 logger = logging.getLogger(__name__)
 
