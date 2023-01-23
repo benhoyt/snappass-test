@@ -40,6 +40,22 @@ snappass-test/0*  active    idle   10.1.147.97         snappass started
 Visit that IP address at port 5000 in your browser and you should see the SnapPass web UI. For example, `http://10.1.147.97:5000/`
 
 
+## Deploying from a local .charm file
+
+You can also deploy directly from a local `.charm` file. First build the charm using `charmcraft pack`, then deploy, specifying resources manually:
+
+```
+$ charmcraft pack
+Packing the charm
+Created 'snappass-test_ubuntu-22.04-amd64.charm'.
+Charms packed:
+    snappass-test_ubuntu-22.04-amd64.charm
+$ juju deploy ./snappass-test/snappass-test_ubuntu-22.04-amd64.charm \
+    --resource snappass-image=benhoyt/snappass-test \
+    --resource redis-image=redis
+```
+
+
 ## Building and uploading this charm
 
 I've already uploaded this charm to Charmhub, so you shouldn't need to do this. But for reference, here are the `charmcraft` commands I used to build and upload (with charmcraft latest/edge: 0.10.0 2021-04-20):
