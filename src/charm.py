@@ -19,7 +19,9 @@ class SnappassTestCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.framework.observe(self.on.snappass_pebble_ready, self._on_snappass_pebble_ready)
+        self.framework.observe(
+            self.on.snappass_pebble_ready, self._on_snappass_pebble_ready
+        )
         self.framework.observe(self.on.redis_pebble_ready, self._on_redis_pebble_ready)
 
     def _on_snappass_pebble_ready(self, event):
